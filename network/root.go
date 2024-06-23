@@ -3,6 +3,7 @@ package network
 import (
 	"diary/types"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"sort"
@@ -42,9 +43,10 @@ func MakeHandler() http.Handler {
 	mux.HandleFunc("/diary", GetDiaryList).Methods("GET")
 	mux.HandleFunc("/diary", PostDiary).Methods("POST")
 	types.MemoMap = make(map[int]types.Memo)
-	types.MemoMap[0] = types.Memo{Id: 0, Title: "title0", Content: "content0"}
+	// id는 1부터 시작해야함, 0으로 시작하면 웹에서 id key를 삭제함
 	types.MemoMap[1] = types.Memo{Id: 1, Title: "title1", Content: "content1"}
-	types.DiaryId = 2
+	types.MemoMap[2] = types.Memo{Id: 2, Title: "title2", Content: "content2"}
+	types.DiaryId = 3
 	return mux
 }
 
@@ -54,10 +56,12 @@ func GetDiary(w http.ResponseWriter, r *http.Request) {
 	v, ok := types.MemoMap[id]
 	if ok {
 		w.WriteHeader(http.StatusOK)
+		w.Header().Set("content-type", "application/json")
 		json.NewEncoder(w).Encode(v)
 
 	} else {
 		w.WriteHeader(http.StatusNotFound)
+		w.Header().Set("content-type", "application/json")
 		json.NewEncoder(w).Encode(types.Memo{})
 	}
 
@@ -68,10 +72,11 @@ func GetDiaryList(w http.ResponseWriter, r *http.Request) {
 	for _, v := range types.MemoMap {
 		memos = append(memos, v)
 	}
-
 	sort.Sort(memos)
 	w.WriteHeader(http.StatusOK)
+	w.Header().Set("content-type", "application/json")
 	json.NewEncoder(w).Encode(memos)
+	fmt.Println(memos)
 }
 
 func PostDiary(w http.ResponseWriter, r *http.Request) {
@@ -91,5 +96,6 @@ func PostDiary(w http.ResponseWriter, r *http.Request) {
 	types.MemoMap[diary.Id] = diary // 등록
 
 	w.WriteHeader(http.StatusCreated)
+	w.Header().Set("content-type", "application/json")
 	json.NewEncoder(w).Encode(diary)
 }
