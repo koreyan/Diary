@@ -3,7 +3,6 @@ package network
 import (
 	"diary/types"
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 	"sort"
@@ -76,7 +75,6 @@ func GetDiaryList(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(memos)
-	fmt.Println(memos)
 }
 
 func PostDiary(w http.ResponseWriter, r *http.Request) {
