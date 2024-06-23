@@ -56,12 +56,12 @@ func GetDiary(w http.ResponseWriter, r *http.Request) {
 	v, ok := types.MemoMap[id]
 	if ok {
 		w.WriteHeader(http.StatusOK)
-		w.Header().Set("content-type", "application/json")
+		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(v)
 
 	} else {
 		w.WriteHeader(http.StatusNotFound)
-		w.Header().Set("content-type", "application/json")
+		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(types.Memo{})
 	}
 
@@ -74,7 +74,7 @@ func GetDiaryList(w http.ResponseWriter, r *http.Request) {
 	}
 	sort.Sort(memos)
 	w.WriteHeader(http.StatusOK)
-	w.Header().Set("content-type", "application/json")
+	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(memos)
 	fmt.Println(memos)
 }
@@ -96,6 +96,6 @@ func PostDiary(w http.ResponseWriter, r *http.Request) {
 	types.MemoMap[diary.Id] = diary // 등록
 
 	w.WriteHeader(http.StatusCreated)
-	w.Header().Set("content-type", "application/json")
+	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(diary)
 }
