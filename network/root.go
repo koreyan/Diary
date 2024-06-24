@@ -41,6 +41,7 @@ func MakeHandler() http.Handler {
 	mux.HandleFunc("/diary/{id:[0-9]+}", GetDiary).Methods("GET")
 	mux.HandleFunc("/diary", GetDiaryList).Methods("GET")
 	mux.HandleFunc("/diary", PostDiary).Methods("POST")
+	mux.HandleFunc("/diary", UpdateDiary).Methods("UPDATE")
 	mux.HandleFunc("/diary/{id:[0-9]+}", DeleteDiary).Methods("DELETE")
 
 	types.MemoMap = make(map[int]types.Memo)
@@ -98,6 +99,23 @@ func PostDiary(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusCreated)
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(diary)
+}
+
+func UpdateDiary(w http.ResponseWriter, r *http.Request) {
+	var diary types.Memo
+	err := json.NewDecoder(r.Body).Decode(&diary)
+	if err != nil {
+		log.Fatal(err)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	if _, ok := types.MemoMap[diary.Id]; ok {
+		diary.Year, diary.Month, diary.Day = time.Now().Date()
+		types.MemoMap[diary.Id] = diary
+		w.WriteHeader(http.StatusOK)
+	} else {
+		w.WriteHeader(http.StatusNotFound)
+	}
 }
 
 func DeleteDiary(w http.ResponseWriter, r *http.Request) {
