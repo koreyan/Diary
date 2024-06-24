@@ -41,6 +41,8 @@ func MakeHandler() http.Handler {
 	mux.HandleFunc("/diary/{id:[0-9]+}", GetDiary).Methods("GET")
 	mux.HandleFunc("/diary", GetDiaryList).Methods("GET")
 	mux.HandleFunc("/diary", PostDiary).Methods("POST")
+	mux.HandleFunc("/diary/{id:[0-9]+}", DeleteDiary).Methods("DELETE")
+
 	types.MemoMap = make(map[int]types.Memo)
 	// id는 1부터 시작해야함, 0으로 시작하면 웹에서 id key를 삭제함
 	types.MemoMap[1] = types.Memo{Id: 1, Title: "title1", Content: "content1"}
@@ -96,4 +98,19 @@ func PostDiary(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusCreated)
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(diary)
+}
+
+func DeleteDiary(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id, _ := strconv.Atoi(vars["id"])
+
+	// 조회
+	if _, ok := types.MemoMap[id]; ok {
+		// 삭제
+		delete(types.MemoMap, id)
+		w.WriteHeader(http.StatusOK)
+	} else {
+		w.WriteHeader(http.StatusNotFound)
+	}
+
 }
